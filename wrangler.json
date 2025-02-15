@@ -1,0 +1,20 @@
+{
+   "$schema": "node_modules/wrangler/config-schema.json",
+   "name": "remix-hono-cloudflare",
+   "main": "./server.ts",
+   "workers_dev": true,
+   "compatibility_date": "2025-02-14",
+   "observability": {
+      "enabled": true
+   },
+   "assets": {
+      "directory": "./build/client"
+   },
+   "build": {
+      "command": "npm run build",
+      "watch_dir": "app"
+   },
+   "vars": {
+      "TEST": 1
+   }
+}

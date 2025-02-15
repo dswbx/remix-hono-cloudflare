@@ -2,17 +2,36 @@ import { createRequestHandler, type ServerBuild } from "@remix-run/cloudflare";
 import { Hono } from "hono";
 import * as build from "./build/server"; // eslint-disable-line import/no-unresolved
 import type { PlatformProxy } from "wrangler";
+import honoRoutes from "~/hono";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleRemixRequest = createRequestHandler(build as any as ServerBuild);
+
+type Variables = {
+   middleware?: boolean;
+   vite?: boolean;
+};
 
 declare global {
    type HonoEnv = {
       Bindings: Env;
    };
+   type GlobalHonoEnv = HonoEnv & { Variables: Variables };
 }
 
-const app = new Hono<HonoEnv>();
+const app = new Hono<GlobalHonoEnv>().use(async (c, next) => {
+   console.log("running global middleware");
+   c.set("middleware", true);
+
+   let vite = false;
+   try {
+      vite = global?.process?.release?.name === "node";
+   } catch (e) {}
+
+   c.set("vite", vite);
+
+   await next();
+});
 const dev = process.env.NODE_ENV !== "production";
 
 type CloudflareContext = Omit<
@@ -21,7 +40,7 @@ type CloudflareContext = Omit<
 > & {
    caches: PlatformProxy<Env>["caches"] | CacheStorage;
    cf: Request["cf"];
-   vite: boolean;
+   vars: Variables;
 };
 
 declare module "@remix-run/cloudflare" {
@@ -31,13 +50,10 @@ declare module "@remix-run/cloudflare" {
    }
 }
 
+app.route("/hono", honoRoutes);
+
 app.all("*", async (c) => {
    const request = c.req.raw;
-
-   let vite = false;
-   try {
-      vite = global?.process?.release?.name === "node";
-   } catch (e) {}
 
    try {
       const context = {
@@ -45,7 +61,7 @@ app.all("*", async (c) => {
          ctx: c.executionCtx,
          env: c.env as Env,
          caches,
-         vite,
+         vars: c.var,
       } as const satisfies CloudflareContext;
 
       try {

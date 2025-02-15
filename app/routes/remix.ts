@@ -13,6 +13,6 @@ export const loader = async (args: LoaderFunctionArgs) => {
       message: "Hello from remix!",
       env: args.context.env,
       runtime: getRuntimeKey(),
-      vite: args.context.vite,
+      vars: args.context.vars,
    });
 };

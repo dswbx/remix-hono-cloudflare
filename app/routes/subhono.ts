@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import { getRuntimeKey } from "hono/adapter";
 
 const handler = async (args: LoaderFunctionArgs | ActionFunctionArgs) => {
-   const app = new Hono<HonoEnv>().basePath("/hono");
+   const app = new Hono<HonoEnv>().basePath("/subhono");
 
    app.get("/", (c) => {
       c.executionCtx.waitUntil(
@@ -22,7 +22,8 @@ const handler = async (args: LoaderFunctionArgs | ActionFunctionArgs) => {
          env: c.env,
          args: args.context.env,
          runtime: getRuntimeKey(),
-         vite: args.context.vite,
+         vars: args.context.vars,
+         var: c.var,
       });
    });
 

@@ -1,10 +1,9 @@
 import { createRequestHandler, type ServerBuild } from "@remix-run/cloudflare";
 import { Hono } from "hono";
-import * as build from "./build/server"; // eslint-disable-line import/no-unresolved
+import * as build from "./build/server";
 import type { PlatformProxy } from "wrangler";
 import honoRoutes from "~/hono";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleRemixRequest = createRequestHandler(build as any as ServerBuild);
 
 type Variables = {
@@ -44,10 +43,7 @@ type CloudflareContext = Omit<
 };
 
 declare module "@remix-run/cloudflare" {
-   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-   interface AppLoadContext extends CloudflareContext {
-      // This will merge the result of `getLoadContext` into the `AppLoadContext`
-   }
+   interface AppLoadContext extends CloudflareContext {}
 }
 
 app.route("/hono", honoRoutes);
@@ -65,7 +61,7 @@ app.all("*", async (c) => {
       } as const satisfies CloudflareContext;
 
       try {
-         // @ts-ignore only in vite
+         // @ts-expect-error only in vite
          if (dev && import.meta.env) {
             // @ts-expect-error it's not typed
             const devBuild = await import("virtual:remix/server-build");

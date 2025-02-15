@@ -1,4 +1,5 @@
-import { createRequestHandler, type ServerBuild } from "@remix-run/cloudflare";
+import { createRequestHandler } from "@react-router/cloudflare";
+import { type ServerBuild } from "react-router";
 import { Hono } from "hono";
 import * as build from "./build/server"; // eslint-disable-line import/no-unresolved
 import type { PlatformProxy } from "wrangler";
@@ -52,7 +53,7 @@ app.all("*", async (c) => {
          // @ts-ignore only in vite
          if (dev && import.meta.env) {
             // @ts-expect-error it's not typed
-            const devBuild = await import("virtual:remix/server-build");
+            const devBuild = await import("virtual:react-router/server-build");
             const handler = createRequestHandler(devBuild, "development");
             return handler(request, context);
          }

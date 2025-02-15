@@ -1,7 +1,4 @@
-import {
-   ActionFunctionArgs,
-   LoaderFunctionArgs,
-} from "@remix-run/server-runtime";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Hono } from "hono";
 import { getRuntimeKey } from "hono/adapter";
 

@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from "@remix-run/server-runtime";
+import type { LoaderFunctionArgs } from "react-router";
 import { getRuntimeKey } from "hono/adapter";
 
 export const loader = async (args: LoaderFunctionArgs) => {

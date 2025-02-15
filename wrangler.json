@@ -11,7 +11,7 @@
       "directory": "./build/client"
    },
    "build": {
-      "command": "npm run build",
+      "command": "[[ -z \"$SKIP\" ]] && npm run build",
       "watch_dir": "app"
    },
    "vars": {

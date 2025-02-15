@@ -9,7 +9,7 @@
       "dev": "remix vite:dev",
       "start": "wrangler dev",
       "typecheck": "tsc",
-      "typegen": "wrangler types"
+      "typegen": "SKIP=1 wrangler types"
    },
    "dependencies": {
       "@remix-run/cloudflare": "^2.15.3",

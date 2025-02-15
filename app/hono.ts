@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getRuntimeKey } from "hono/adapter";
 
-const app = new Hono<GlobalHonoEnv>().get("/", async (c) => {
+const app = new Hono<HonoAppEnv>().get("/", async (c) => {
    c.executionCtx.waitUntil(
       (async () => {
          await new Promise((resolve) => setTimeout(resolve, 1000));

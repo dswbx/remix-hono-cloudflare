@@ -3,35 +3,23 @@ import { Hono } from "hono";
 import * as build from "./build/server";
 import type { PlatformProxy } from "wrangler";
 import honoRoutes from "~/hono";
+import { dummy, viteInfo } from "~/middlewares";
 
 const handleRemixRequest = createRequestHandler(build as any as ServerBuild);
+const dev = process.env.NODE_ENV !== "production";
 
-type Variables = {
-   middleware?: boolean;
-   vite?: boolean;
-};
+const app = new Hono<{
+   Bindings: Env;
+}>().use(dummy, viteInfo);
+
+type HonoContext = typeof app extends Hono<infer T> ? T : never;
 
 declare global {
    type HonoEnv = {
-      Bindings: Env;
+      Bindings: HonoContext["Bindings"];
    };
-   type GlobalHonoEnv = HonoEnv & { Variables: Variables };
+   type HonoAppEnv = HonoContext;
 }
-
-const app = new Hono<GlobalHonoEnv>().use(async (c, next) => {
-   console.log("running global middleware");
-   c.set("middleware", true);
-
-   let vite = false;
-   try {
-      vite = global?.process?.release?.name === "node";
-   } catch (e) {}
-
-   c.set("vite", vite);
-
-   await next();
-});
-const dev = process.env.NODE_ENV !== "production";
 
 type CloudflareContext = Omit<
    PlatformProxy<Env>,
@@ -39,7 +27,7 @@ type CloudflareContext = Omit<
 > & {
    caches: PlatformProxy<Env>["caches"] | CacheStorage;
    cf: Request["cf"];
-   vars: Variables;
+   vars: HonoContext["Variables"];
 };
 
 declare module "@remix-run/cloudflare" {
